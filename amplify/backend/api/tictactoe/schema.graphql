@@ -1,0 +1,119 @@
+type Mutation {
+    startGame(invitee: String!): GameData
+        @function(name: "startGame-${env}")
+        @aws_cognito_user_pools
+
+    playMove(game: ID!, index: Int!): GameData
+        @function(name: "playMove-${env}")
+        @aws_cognito_user_pools
+
+    addExpoToken(token: String!): ExpoToken
+        @function(name: "addExpoToken-${env}")
+        @aws_cognito_user_pools
+}
+
+type Subscription {
+    onUpdateGameById(id: ID!): Game
+        @aws_subscribe(mutations: ["updateGame"])
+        @aws_cognito_user_pools
+}
+
+type GameData {
+    id: ID!
+    status: GameStatus!
+    turn: String!
+    state: [Symbol]!
+    winner: String
+}
+
+type Player
+    @model
+    @searchable
+    @key(fields: ["username"])
+    @auth(
+        rules: [
+            { allow: private, operations: [read] }
+            { allow: owner, ownerField: "username", operations: [update] }
+            { allow: private, provider: iam, operations: [read, create, update, delete] }
+        ]
+    ) {
+    id: ID!
+    cognitoID: String!
+    username: String!
+    name: String!
+    email: AWSEmail!
+    games: [PlayerGame] @connection(keyName: "byPlayer", fields: ["username"])
+    tokens: [ExpoToken] @connection(keyName: "byPlayer", fields: ["username"])
+}
+
+type PlayerGame
+    @model(queries: null)
+    @key(name: "byGame", fields: ["gameID"])
+    @key(name: "byPlayer", fields: ["playerUsername", "createdAt"])
+    @auth(
+        rules: [
+            { allow: private, operations: [read] }
+            { allow: private, provider: iam, operations: [read, create, update, delete] }
+        ]
+    ) {
+    id: ID!
+    createdAt: String!
+    gameID: ID!
+    playerUsername: String!
+    owners: [String!]!
+    game: Game! @connection(fields: ["gameID"])
+    player: Player! @connection(fields: ["playerUsername"])
+}
+
+type Game
+    @model
+    @auth(
+        rules: [
+            { allow: owner, ownerField: "owners", operations: [read] }
+            { allow: private, provider: iam, operations: [read, create, update, delete] }
+        ]
+    ) {
+    id: ID!
+    status: GameStatus!
+    owners: [String!]!
+    initiator: String!
+    turn: String!
+    state: [Symbol]!
+    winner: String
+    players: [PlayerGame] @connection(keyName: "byGame", fields: ["id"])
+}
+
+enum GameStatus {
+    REQUESTED
+    DECLINED
+    ACTIVE
+    FINISHED
+    CANCELLED
+}
+
+enum Symbol {
+    x
+    o
+}
+
+type ExpoToken
+    @model
+    @key(fields: ["token"])
+    @key(name: "byPlayer", fields: ["playerUsername"])
+    @auth(
+        rules: [
+            { allow: owner, ownerField: "playerUsername", operations: [read, delete] }
+            { allow: private, provider: iam, operations: [read, create, update, delete] }
+        ]
+    ) {
+    id: ID!
+    token: String!
+    playerUsername: String!
+}
+
+type ExpoTicketsObject
+    @model
+    @auth(rules: [{ allow: private, provider: iam, operations: [read, create, update, delete] }]) {
+    id: ID!
+    tickets: AWSJSON!
+}

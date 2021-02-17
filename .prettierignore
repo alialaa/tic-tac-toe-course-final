@@ -1,0 +1,5 @@
+node_modules
+.expo
+.expo-shared
+package-lock.json
+src/API.ts

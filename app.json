@@ -1,0 +1,38 @@
+{
+    "expo": {
+        "name": "tic-tac-toe",
+        "slug": "tic-tac-toe",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./assets/icon.png",
+        "splash": {
+            "image": "./assets/splash.png",
+            "resizeMode": "contain",
+            "backgroundColor": "#ffffff"
+        },
+        "updates": {
+            "fallbackToCacheTimeout": 0
+        },
+        "assetBundlePatterns": ["**/*"],
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.alialaa.tictactoe",
+            "buildNumber": "1.0.0",
+            "config": {
+                "googleMobileAdsAppId": "ca-app-pub-9388643362460144~6456315685"
+            }
+        },
+        "android": {
+            "useNextNotificationsApi": true,
+            "package": "com.alialaa.tictactoe",
+            "versionCode": 1,
+            "permissions": ["VIBRATE"],
+            "config": {
+                "googleMobileAdsAppId": "ca-app-pub-9388643362460144~1395560693"
+            }
+        },
+        "web": {
+            "favicon": "./assets/favicon.png"
+        }
+    }
+}

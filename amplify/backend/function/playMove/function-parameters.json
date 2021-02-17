@@ -1,0 +1,8 @@
+{
+    "permissions": {
+        "api": {
+            "tictactoe": ["create", "read", "update"]
+        }
+    },
+    "lambdaLayers": []
+}
